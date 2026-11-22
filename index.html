@@ -1,20 +1,29 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>First Mate</title>
 <meta name="description" content="First Mate: a high-agency organizational harness. Your crew of agents works; you make the calls.">
 <meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#fbfbf8;--fg:#1d1f24;--dim:#6b6f78;--acc:#b5560f;--ok:#2f7d32;--rule:#d9d9d2}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#16171f;--fg:#e6e6e3;--dim:#8a8e99;--acc:#f5a356;--ok:#7cc77f;--rule:#2c2e38}}
 :root[data-theme=dark]{--bg:#16171f;--fg:#e6e6e3;--dim:#8a8e99;--acc:#f5a356;--ok:#7cc77f;--rule:#2c2e38}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--fg);overflow-x:hidden}
-body{font:14px/1.35 ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;padding:28px 16px 40px;max-width:1080px;margin:0 auto}
+body{font:14px/1.35 ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:8px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+.hero{position:relative;height:min(88svh,820px);min-height:520px;overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:crosshair}
+.hero h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);margin:0}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:48px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));
+  background:linear-gradient(to bottom,transparent,color-mix(in srgb,var(--bg) 90%,transparent) 55%);pointer-events:none}
+.cap>div{max-width:1048px;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between;align-items:flex-end}
+.hint{color:var(--dim);font-size:12px}
 pre{margin:0;font:inherit;white-space:pre}
-.title{color:var(--acc);font-size:clamp(5px,calc((100vw - 34px) / 36),22px);line-height:1;overflow:hidden}
-.title{height:4em}
-.title.w{font-size:clamp(2.5px,calc((100vw - 34px) / 72),11px);height:8em;width:max-content;max-width:100%;user-select:none;-webkit-user-select:none}
-.line{margin:14px 0 4px;font-size:clamp(14px,2.2vw,18px)}
+.line{margin:0;font-size:clamp(14px,2.2vw,18px)}
 .dim,i{color:var(--dim);font-style:normal}
 .bar{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:22px 0 14px;padding:6px 0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .demo{color:var(--acc)}
@@ -32,11 +41,13 @@ pre{margin:0;font:inherit;white-space:pre}
 @media (max-width:520px){body{font-size:13px}.bar{white-space:normal}}
 footer{margin-top:28px;color:var(--dim)}
 </style></head><body>
-<pre class="title" role="img" aria-label="First Mate">█▀▀▀▀ ▀▀█▀▀ █▀▀▀▄ ▄▀▀▀▀ ▀▀█▀▀     █▄ ▄█ ▄▀▀▀▄ ▀▀█▀▀ █▀▀▀▀
-█▄▄▄    █   █▄▄▄▀ ▀▄▄▄    █       █ █ █ █▄▄▄█   █   █▄▄▄
-█       █   █ ▀▄      █   █       █   █ █   █   █   █
-▀     ▀▀▀▀▀ ▀   ▀ ▀▀▀▀    ▀       ▀   ▀ ▀   ▀   ▀   ▀▀▀▀▀</pre>
-<p class="line">a high-agency organizational harness.<br><span class="dim">your crew of agents does the work. you only make the calls.</span></p>
+<header class="hero">
+<h1>First Mate</h1>
+<canvas id="sea" aria-hidden="true"></canvas>
+<div class="cap"><div><p class="line">a high-agency organizational harness.<br><span class="dim">your crew of agents does the work. you only make the calls.</span></p>
+<span class="hint">move through the water · click or tap to send a ring</span></div></div>
+</header>
+<div class="wrap">
 <div class="bar"><span class="demo">DEMO</span> · crew stats · <span class="dim">made-up figures, replayed as if live</span></div>
 <div class="grid"><pre class="p" id="p-a"><b>AUTONOMY</b>
 <i>today</i>
@@ -68,6 +79,7 @@ WAITING 6 h oldest · 4 items, 1 ≥12 h
 Captain 2·1.5 h  Quartermaster 1·0.2 h  leads 3·6 h  2 READY</pre>
 <div class="log" aria-live="off" data-log></div>
 <footer>firstmate.sh · coming soon · nothing to sign up for yet<span class="cur"></span></footer>
+</div>
 <script>
 (()=>{
 const q=new URLSearchParams(location.search).get("theme");if(q==="light"||q==="dark")document.documentElement.dataset.theme=q;
@@ -90,33 +102,138 @@ function tick(){
 }
 const calm=matchMedia("(prefers-reduced-motion: reduce)").matches;
 tick();if(!calm)setInterval(tick,2400);
-// ASCII wake on the wordmark: decorative, off under reduced motion, no frame loop at rest
-const REACH=65,TRAIL=3.4,RAMP="░▒▒▓█";
-const T=document.querySelector(".title");
-if(!calm&&T&&window.requestAnimationFrame){
- const P=["1111101111101111000111101111100000100010011100111110111110", "1000000010001000101000000010000000110110100010001000100000", "1000000010001000101000000010000000101010100010001000100000", "1111000010001111000111000010000000101010111110001000111100", "1000000010001010000000100010000000100010100010001000100000", "1000000010001001000000100010000000100010100010001000100000", "1000001111101000101111000010000000100010100010001000111110", "0000000000000000000000000000000000000000000000000000000000"],H=P.length,W=P[0].length*2,N=W*H,ink=[],heat=new Float32Array(N),ring=new Float32Array(N);
- for(let i=0;i<N;i++){ink[i]=P[i/W|0][(i%W)>>1]==="1";heat[i]=ink[i]?1:0;}
- let rings=[],raf=0,last=0,prev="";
- T.classList.add("w");
- const draw=()=>{let s="";for(let i=0;i<N;i++){const h=Math.max(heat[i],ring[i]);s+=ink[i]?RAMP[Math.ceil(Math.min(1,h)*4)]:h>.55?"·":" ";if(i%W===W-1&&i<N-1)s+="\n";}if(s!==prev)T.textContent=prev=s;};
- // f(distance in px) -> warmth for that cell; a cell only ever gets warmer here. Rings live in their own layer so they pass and leave no trail
- const warm=(b,px,py,f,heat)=>{const cw=b.width/W,ch=b.height/H;for(let i=0;i<N;i++){const v=f(Math.hypot((i%W+.5)*cw-px,((i/W|0)+.5)*ch-py));if(v>heat[i])heat[i]=v;}};
- const frame=t=>{
-  const dt=Math.min(.05,(t-last)/1e3);last=t;let live=0;
-  for(let i=0;i<N;i++)if(heat[i]>0&&(heat[i]=Math.max(0,heat[i]-dt/TRAIL))>0)live=1;
-  ring.fill(0);
-  if(rings.length){const b=T.getBoundingClientRect();rings=rings.filter(r=>{r.a+=dt;const k=1-r.a/1.4,rad=r.a*b.width*.7,w=r.R*.6;if(k<=0)return 0;warm(b,r.x,r.y,d=>1.2*k*(1-Math.abs(d-rad)/w),ring);return live=1;});}
-  draw();raf=live?requestAnimationFrame(frame):0;
- };
- const kick=()=>{if(!raf){last=performance.now();raf=requestAnimationFrame(frame);}};
- const at=e=>{const p=e.touches?e.touches[0]:e,b=T.getBoundingClientRect(),R=REACH*.016*b.height,x=p.clientX-b.left,y=p.clientY-b.top;
-  return x<-R||y<-R||x>b.width+R||y>b.height+R?0:{b,R,x,y};};
- const move=e=>{const h=at(e);if(h){warm(h.b,h.x,h.y,d=>1-d/h.R,heat);kick();}};
- addEventListener("pointermove",move,{passive:true});
- addEventListener("touchmove",move,{passive:true});
- addEventListener("pointerdown",e=>{const h=at(e);if(h){rings.push({x:h.x,y:h.y,R:h.R,a:0});kick();}},{passive:true});
- draw();kick();
+
+// Particle sea hero: points drift as a swell, gather into FIRST MATE, loosen again.
+// Pointer is a hull (bow push + wake rings); a click sends a ring. Pauses when hidden or off screen;
+// a single settled frame under reduced motion.
+(()=>{
+const FONT='Big Shoulders Display';
+const cv=document.getElementById("sea");if(!cv||!cv.getContext)return;
+const ctx=cv.getContext("2d",{alpha:false}),hero=cv.parentElement;
+const RM=matchMedia("(prefers-reduced-motion: reduce)");
+let W=0,H=0,DPR=1,N=0,BX,BY,TP,X,Y,SZ,TX,TY,HAS,M,M0,DL,OX,OY,PH,BK,ORD,fsz=2.4;
+let colors={},styles=[];const NB_SEA=12,NB_ACC=8,NB=NB_SEA+NB_ACC;
+const sources=[],ptr={x:-1e4,y:-1e4,on:false,speed:0,t:0,ex:-1e4,ey:-1e4};
+const T={goal:0,t0:-100,dur:1.5,maxDelay:1.05,typed:false,phase:"sea",ps:0};
+window.__fm={dt:[],work:[]};
+const hex=h=>{h=h.trim().replace("#","");if(h.length===3)h=h.replace(/./g,c=>c+c);const n=parseInt(h,16)||0;return[(n>>16)&255,(n>>8)&255,n&255]};
+function readColors(){
+ const cs=getComputedStyle(document.documentElement);
+ colors={bg:cs.getPropertyValue("--bg").trim(),fg:hex(cs.getPropertyValue("--fg")),acc:hex(cs.getPropertyValue("--acc"))};
+ styles=[];
+ for(let b=0;b<NB_SEA;b++)styles.push(`rgba(${colors.fg},${(0.10+0.9*Math.pow(b/(NB_SEA-1),1.3)).toFixed(3)})`);
+ for(let b=0;b<NB_ACC;b++)styles.push(`rgba(${colors.acc},${(0.35+0.65*b/(NB_ACC-1)).toFixed(3)})`);
 }
+const horizon=()=>H*(W<700?0.40:0.36);
+function build(){
+ const r=hero.getBoundingClientRect();W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));
+ DPR=Math.min(2,devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
+ const hz=horizon(),seaH=H-hz,Nmax=W<700?4200:9000,g=Math.max(6,Math.sqrt(W*seaH*1.5/Nmax));
+ const cols=Math.ceil(W/g)+2,rows=Math.max(8,Math.round(seaH/g*1.5));N=cols*rows;
+ const F=()=>new Float32Array(N);
+ BX=F();BY=F();TP=F();X=F();Y=F();SZ=F();TX=F();TY=F();M=F();M0=F();DL=F();OX=F();OY=F();PH=F();
+ HAS=new Uint8Array(N);BK=new Uint8Array(N);ORD=new Int32Array(N);
+ let i=0;
+ for(let k=0;k<rows;k++){const f=k/(rows-1),t=0.08+0.92*f,y=hz+(seaH+g)*Math.pow(f,1.45);
+  for(let c=0;c<cols;c++,i++){BX[i]=(c-1+(k&1)*0.5)*g+(Math.random()-0.5)*g*0.3;BY[i]=y;TP[i]=t;PH[i]=Math.random()*6.283;OX[i]=(Math.random()-0.5)*120;OY[i]=-40-Math.random()*110;}}
+ layout();
+}
+function layout(){
+ const oc=document.createElement("canvas");oc.width=W;oc.height=H;
+ const o=oc.getContext("2d",{willReadFrequently:true});o.fillStyle="#fff";o.textBaseline="alphabetic";
+ const face=px=>`900 ${px}px "${FONT}", ui-monospace, Menlo, monospace`;
+ const sp=fs=>{if("letterSpacing" in o)o.letterSpacing=(fs*0.05).toFixed(1)+"px"};
+ o.font=face(100);sp(100);
+ const narrow=W<700,lines=narrow?["FIRST","MATE"]:["FIRST MATE"];
+ const w100=Math.max(...lines.map(l=>o.measureText(l).width));
+ const m=o.measureText("FIRST"),asc=(m.actualBoundingBoxAscent||72)/100;
+ const fs=Math.min((narrow?W*0.86:Math.min(W*0.84,1200))/(w100/100),H*(narrow?0.17:0.24));
+ o.font=face(fs);sp(fs);
+ const lh=fs*asc*1.28,blockH=fs*asc+(lines.length-1)*lh,cy=H*(narrow?0.38:0.42);
+ lines.forEach((l,k)=>{const w=o.measureText(l).width;o.fillText(l,(W-w)/2,cy-blockH/2+fs*asc+k*lh);});
+ const img=o.getImageData(0,0,W,H).data;
+ let ink=0;for(let y=0;y<H;y+=2)for(let x=0;x<W;x+=2)if(img[(y*W+x)*4+3]>128)ink++;ink*=4;
+ const want=Math.floor(N*0.42),s=Math.max(narrow?2.6:3.2,Math.sqrt(ink/want)),pts=[];
+ for(let y=s/2;y<H;y+=s)for(let x=s/2;x<W;x+=s)if(img[((y|0)*W+(x|0))*4+3]>128)pts.push([x,y]);
+ const shuf=a=>{for(let k=a.length-1;k>0;k--){const j=(Math.random()*(k+1))|0;[a[k],a[j]]=[a[j],a[k]];}return a};
+ shuf(pts);const K=Math.min(pts.length,want),tg=pts.slice(0,K).sort((a,b)=>a[0]-b[0]);
+ const pick=shuf(Array.from({length:N},(_,i)=>i)).slice(0,K).sort((a,b)=>BX[a]-BX[b]);
+ HAS.fill(0);const minx=K?tg[0][0]:0,maxx=K?tg[K-1][0]:1;
+ fsz=Math.max(1.8,Math.min(3.8,s*0.8));
+ for(let k=0;k<K;k++){const i=pick[k];HAS[i]=1;TX[i]=tg[k][0];TY[i]=tg[k][1];DL[i]=(tg[k][0]-minx)/Math.max(1,maxx-minx)*0.9+Math.random()*0.15;}
+}
+const ease=x=>x<0.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+function go(goal,now){for(let i=0;i<N;i++)M0[i]=M[i];T.goal=goal;T.t0=now;T.dur=goal?1.5:1.7;T.typed=goal===1;}
+function step(now){
+ const el=now-T.ps;
+ if(T.phase==="sea"&&el>3.4){T.phase="gather";T.ps=now;go(1,now);}
+ else if(T.phase==="gather"&&el>2.6){T.phase="hold";T.ps=now;}
+ else if(T.phase==="hold"&&el>4.6){T.phase="loosen";T.ps=now;go(0,now);}
+ else if(T.phase==="loosen"&&el>2.8){T.phase="sea";T.ps=now;}
+ const amp=Math.min(20,H*0.026);
+ for(let k=sources.length-1;k>=0;k--)if(now-sources[k].t0>sources[k].life)sources.splice(k,1);
+ const S=sources.map(s=>{const a=now-s.t0,r=a*s.spd;return{x:s.x,y:s.y,r,w:s.w,d:Math.pow(1-a/s.life,2)*s.amp,ro:r+3*s.w,ri:Math.max(0,r-3*s.w),acc:s.acc}});
+ ptr.speed*=0.9;const hullR=46+Math.min(40,ptr.speed*0.02),hullA=Math.min(1,ptr.speed/400)*22;
+ const cnt=new Int32Array(NB);
+ for(let i=0;i<N;i++){
+  let m=0;
+  if(HAS[i]){const d=T.typed?DL[i]:PH[i]/6.283*T.maxDelay;m=M0[i]+(T.goal-M0[i])*ease(Math.min(1,Math.max(0,(now-T.t0-d)/T.dur)));}
+  M[i]=m;
+  const t=TP[i],z=1/t,wx=(BX[i]-W/2)/W*z;
+  const h=Math.sin(wx*5.2+z*1.6-now*0.85)*0.55+Math.sin(wx*-2.7+z*2.8-now*1.25+1.3)*0.32+Math.sin(wx*12+z*0.9+now*0.6)*0.13;
+  const sx=BX[i]+Math.sin(z*2.1-now*0.7+wx*3)*3*t,sy=BY[i]-h*amp*t;
+  let x=sx,y=sy;
+  if(m>0){const br=m>=1?0.5:0,ph=PH[i],fx=TX[i]+Math.sin(now*1.3+ph)*br,fy=TY[i]+Math.cos(now*1.1+ph)*br,arc=Math.sin(Math.PI*m);
+   x=sx+(fx-sx)*m+OX[i]*arc;y=sy+(fy-sy)*m+OY[i]*arc;}
+  let dx=0,dy=0,foam=0,accf=0;
+  for(let k=0;k<S.length;k++){const s=S[k],ax=x-s.x;if(ax>s.ro||ax<-s.ro)continue;const ay=(y-s.y)/0.6;if(ay>s.ro||ay<-s.ro)continue;
+   const d2=ax*ax+ay*ay;if(d2>s.ro*s.ro||d2<s.ri*s.ri)continue;const d=Math.sqrt(d2)+1e-3,q=(d-s.r)/s.w,g=Math.exp(-q*q)*s.d;
+   dx+=ax/d*g;dy+=ay/d*g*0.6;foam+=Math.abs(g);if(s.acc)accf+=Math.abs(g);}
+  if(hullA>0.3){const ax=x-ptr.x,ay=y-ptr.y,d2=ax*ax+ay*ay;if(d2<hullR*hullR){const d=Math.sqrt(d2)+1e-3,f=Math.pow(1-d/hullR,2)*hullA;dx+=ax/d*f;dy+=ay/d*f;foam+=f;}}
+  const wg=1-0.35*m;X[i]=x+dx*wg;Y[i]=y+dy*wg;
+  const ss=0.7+2.0*Math.pow(t,1.15);SZ[i]=ss+(fsz-ss)*m;
+  let b;
+  if(m>0.5||accf>6){const lv=m>0.5?(m-0.5)*2:Math.min(1,(accf-6)/10);b=NB_SEA+Math.min(NB_ACC-1,Math.round(lv*(NB_ACC-1)));}
+  else{const lum=0.16+0.5*t+(h>0?h*h*0.55:0)+Math.min(0.85,foam*0.13)+m*1.2;b=Math.min(NB_SEA-1,Math.max(0,Math.round(lum*(NB_SEA-1))));}
+  BK[i]=b;cnt[b]++;
+ }
+ const off=new Int32Array(NB);for(let b=1;b<NB;b++)off[b]=off[b-1]+cnt[b-1];
+ for(let i=0;i<N;i++)ORD[off[BK[i]]++]=i;
+ ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=colors.bg;ctx.fillRect(0,0,W,H);
+ let p=0;for(let b=0;b<NB;b++){if(!cnt[b])continue;ctx.fillStyle=styles[b];for(const e=p+cnt[b];p<e;p++){const i=ORD[p],s=SZ[i];ctx.fillRect(X[i]-s/2,Y[i]-s/2,s,s);}}
+}
+let raf=0,running=false,visible=!document.hidden,onscreen=true,last=0,clock=0,ready=false;
+function frame(ms){raf=0;if(!running)return;const dt=last?Math.min(0.05,(ms-last)/1000):0.016;
+ const st=window.__fm;if(last){st.dt.push(ms-last);if(st.dt.length>900)st.dt.shift();}last=ms;clock+=dt;
+ const w0=performance.now();step(clock);st.work.push(performance.now()-w0);if(st.work.length>900)st.work.shift();
+ raf=requestAnimationFrame(frame);}
+function still(){sources.length=0;ptr.speed=0;for(let i=0;i<N;i++)M0[i]=M[i]=HAS[i];T.goal=1;T.t0=-100;T.phase="hold";T.ps=clock;step(clock);}
+function sync(){if(!ready)return;const should=visible&&onscreen&&!RM.matches;
+ if(should&&!running){running=true;last=0;raf=requestAnimationFrame(frame);}
+ else if(!should&&running){running=false;if(raf)cancelAnimationFrame(raf);raf=0;}
+ if(RM.matches)still();}
+document.addEventListener("visibilitychange",()=>{visible=!document.hidden;sync();});
+if("IntersectionObserver" in window)new IntersectionObserver(es=>{onscreen=es[0].isIntersecting;sync();}).observe(hero);
+RM.addEventListener&&RM.addEventListener("change",sync);
+const loc=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+cv.addEventListener("pointermove",e=>{const[x,y]=loc(e),now=clock;
+ if(ptr.on)ptr.speed=Math.max(ptr.speed,Math.hypot(x-ptr.x,y-ptr.y)/Math.max(0.008,now-ptr.t));
+ ptr.x=x;ptr.y=y;ptr.t=now;ptr.on=true;
+ if(Math.hypot(x-ptr.ex,y-ptr.ey)>12){ptr.ex=x;ptr.ey=y;sources.push({x,y,t0:now,life:1.9,spd:70,w:11,amp:Math.min(14,3+ptr.speed*0.012),acc:false});if(sources.length>70)sources.shift();}
+},{passive:true});
+cv.addEventListener("pointerleave",()=>{ptr.on=false;ptr.x=ptr.y=-1e4;});
+cv.addEventListener("pointerdown",e=>{if(RM.matches)return;const[x,y]=loc(e);sources.push({x,y,t0:clock,life:2.6,spd:330,w:20,amp:24,acc:true});},{passive:true});
+const relayout=()=>{readColors();if(ready&&(RM.matches||!running))step(clock);};
+matchMedia("(prefers-color-scheme: dark)").addEventListener&&matchMedia("(prefers-color-scheme: dark)").addEventListener("change",relayout);
+let rt=0;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!ready)return;const formed=T.goal===1;build();if(formed){for(let i=0;i<N;i++)M[i]=HAS[i];go(1,clock-10);}if(RM.matches)still();},150);});
+readColors();
+const fl=document.fonts&&document.fonts.load?Promise.race([document.fonts.load(`900 100px "${FONT}"`),new Promise(r=>setTimeout(r,1500))]):Promise.resolve();
+fl.catch(()=>{}).then(()=>{build();ready=true;
+ const q=new URLSearchParams(location.search).get("hero");
+ if(q==="form"){for(let i=0;i<N;i++)M[i]=HAS[i];go(1,-10);T.phase="hold";T.ps=1e9;}
+ else if(q==="sea"){T.phase="sea";T.ps=1e9;}
+ sync();});
+})();
 })();
 </script>
 </body></html>
