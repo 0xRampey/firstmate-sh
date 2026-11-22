@@ -12,6 +12,8 @@ html,body{margin:0;background:var(--bg);color:var(--fg);overflow-x:hidden}
 body{font:14px/1.35 ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;padding:28px 16px 40px;max-width:1080px;margin:0 auto}
 pre{margin:0;font:inherit;white-space:pre}
 .title{color:var(--acc);font-size:clamp(5px,calc((100vw - 34px) / 36),22px);line-height:1;overflow:hidden}
+.title{height:4em}
+.title.w{font-size:clamp(2.5px,calc((100vw - 34px) / 72),11px);height:8em;width:max-content;max-width:100%;user-select:none;-webkit-user-select:none}
 .line{margin:14px 0 4px;font-size:clamp(14px,2.2vw,18px)}
 .dim,i{color:var(--dim);font-style:normal}
 .bar{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:22px 0 14px;padding:6px 0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -30,7 +32,7 @@ pre{margin:0;font:inherit;white-space:pre}
 @media (max-width:520px){body{font-size:13px}.bar{white-space:normal}}
 footer{margin-top:28px;color:var(--dim)}
 </style></head><body>
-<pre class="title" aria-label="First Mate">█▀▀▀▀ ▀▀█▀▀ █▀▀▀▄ ▄▀▀▀▀ ▀▀█▀▀     █▄ ▄█ ▄▀▀▀▄ ▀▀█▀▀ █▀▀▀▀
+<pre class="title" role="img" aria-label="First Mate">█▀▀▀▀ ▀▀█▀▀ █▀▀▀▄ ▄▀▀▀▀ ▀▀█▀▀     █▄ ▄█ ▄▀▀▀▄ ▀▀█▀▀ █▀▀▀▀
 █▄▄▄    █   █▄▄▄▀ ▀▄▄▄    █       █ █ █ █▄▄▄█   █   █▄▄▄
 █       █   █ ▀▄      █   █       █   █ █   █   █   █
 ▀     ▀▀▀▀▀ ▀   ▀ ▀▀▀▀    ▀       ▀   ▀ ▀   ▀   ▀   ▀▀▀▀▀</pre>
@@ -86,7 +88,35 @@ function tick(){
   const sp=p.querySelector("[data-sp]");sp.textContent=sp.textContent.slice(1)+bars[Math.floor(Math.random()*4)+3];}
  const e=document.createElement("span");e.textContent=hm+"  "+lines[li++%lines.length];log.prepend(e);while(log.children.length>5)log.lastChild.remove();
 }
-tick();if(!matchMedia("(prefers-reduced-motion: reduce)").matches)setInterval(tick,2400);
+const calm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+tick();if(!calm)setInterval(tick,2400);
+// ASCII wake on the wordmark: decorative, off under reduced motion, no frame loop at rest
+const REACH=65,TRAIL=3.4,RAMP="░▒▒▓█";
+const T=document.querySelector(".title");
+if(!calm&&T&&window.requestAnimationFrame){
+ const P=["1111101111101111000111101111100000100010011100111110111110", "1000000010001000101000000010000000110110100010001000100000", "1000000010001000101000000010000000101010100010001000100000", "1111000010001111000111000010000000101010111110001000111100", "1000000010001010000000100010000000100010100010001000100000", "1000000010001001000000100010000000100010100010001000100000", "1000001111101000101111000010000000100010100010001000111110", "0000000000000000000000000000000000000000000000000000000000"],H=P.length,W=P[0].length*2,N=W*H,ink=[],heat=new Float32Array(N),ring=new Float32Array(N);
+ for(let i=0;i<N;i++){ink[i]=P[i/W|0][(i%W)>>1]==="1";heat[i]=ink[i]?1:0;}
+ let rings=[],raf=0,last=0,prev="";
+ T.classList.add("w");
+ const draw=()=>{let s="";for(let i=0;i<N;i++){const h=Math.max(heat[i],ring[i]);s+=ink[i]?RAMP[Math.ceil(Math.min(1,h)*4)]:h>.55?"·":" ";if(i%W===W-1&&i<N-1)s+="\n";}if(s!==prev)T.textContent=prev=s;};
+ // f(distance in px) -> warmth for that cell; a cell only ever gets warmer here. Rings live in their own layer so they pass and leave no trail
+ const warm=(b,px,py,f,heat)=>{const cw=b.width/W,ch=b.height/H;for(let i=0;i<N;i++){const v=f(Math.hypot((i%W+.5)*cw-px,((i/W|0)+.5)*ch-py));if(v>heat[i])heat[i]=v;}};
+ const frame=t=>{
+  const dt=Math.min(.05,(t-last)/1e3);last=t;let live=0;
+  for(let i=0;i<N;i++)if(heat[i]>0&&(heat[i]=Math.max(0,heat[i]-dt/TRAIL))>0)live=1;
+  ring.fill(0);
+  if(rings.length){const b=T.getBoundingClientRect();rings=rings.filter(r=>{r.a+=dt;const k=1-r.a/1.4,rad=r.a*b.width*.7,w=r.R*.6;if(k<=0)return 0;warm(b,r.x,r.y,d=>1.2*k*(1-Math.abs(d-rad)/w),ring);return live=1;});}
+  draw();raf=live?requestAnimationFrame(frame):0;
+ };
+ const kick=()=>{if(!raf){last=performance.now();raf=requestAnimationFrame(frame);}};
+ const at=e=>{const p=e.touches?e.touches[0]:e,b=T.getBoundingClientRect(),R=REACH*.016*b.height,x=p.clientX-b.left,y=p.clientY-b.top;
+  return x<-R||y<-R||x>b.width+R||y>b.height+R?0:{b,R,x,y};};
+ const move=e=>{const h=at(e);if(h){warm(h.b,h.x,h.y,d=>1-d/h.R,heat);kick();}};
+ addEventListener("pointermove",move,{passive:true});
+ addEventListener("touchmove",move,{passive:true});
+ addEventListener("pointerdown",e=>{const h=at(e);if(h){rings.push({x:h.x,y:h.y,R:h.R,a:0});kick();}},{passive:true});
+ draw();kick();
+}
 })();
 </script>
 </body></html>
