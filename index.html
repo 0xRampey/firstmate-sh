@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>First Mate</title>
+<meta name="description" content="First Mate: a high-agency organizational harness. Your crew of agents works; you make the calls.">
+<meta name="color-scheme" content="light dark">
+<style>
+:root{--bg:#fbfbf8;--fg:#1d1f24;--dim:#6b6f78;--acc:#b5560f;--ok:#2f7d32;--rule:#d9d9d2}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#16171f;--fg:#e6e6e3;--dim:#8a8e99;--acc:#f5a356;--ok:#7cc77f;--rule:#2c2e38}}
+:root[data-theme=dark]{--bg:#16171f;--fg:#e6e6e3;--dim:#8a8e99;--acc:#f5a356;--ok:#7cc77f;--rule:#2c2e38}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);overflow-x:hidden}
+body{font:14px/1.35 ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;padding:28px 16px 40px;max-width:1080px;margin:0 auto}
+pre{margin:0;font:inherit;white-space:pre}
+.title{color:var(--acc);font-size:clamp(5px,calc((100vw - 34px) / 36),22px);line-height:1;overflow:hidden}
+.line{margin:14px 0 4px;font-size:clamp(14px,2.2vw,18px)}
+.dim,i{color:var(--dim);font-style:normal}
+.bar{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:22px 0 14px;padding:6px 0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.demo{color:var(--acc)}
+.grid{display:flex;flex-wrap:wrap;gap:18px 40px}
+.p{min-width:30ch}
+.p b{font-weight:700}
+.big{color:var(--fg);line-height:1.05;display:inline-block;margin:4px 0 2px}
+.sp{color:var(--ok)}
+.foot{margin-top:18px;white-space:pre-wrap}
+.log{margin-top:16px;color:var(--dim);height:6.75em;overflow:hidden;white-space:pre-wrap}
+.log span{display:block}
+.cur::after{content:"█";animation:b 1.1s steps(1) infinite;color:var(--acc)}
+@keyframes b{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.cur::after{animation:none}}
+@media (max-width:520px){body{font-size:13px}.bar{white-space:normal}}
+footer{margin-top:28px;color:var(--dim)}
+</style></head><body>
+<pre class="title" aria-label="First Mate">█▀▀▀▀ ▀▀█▀▀ █▀▀▀▄ ▄▀▀▀▀ ▀▀█▀▀     █▄ ▄█ ▄▀▀▀▄ ▀▀█▀▀ █▀▀▀▀
+█▄▄▄    █   █▄▄▄▀ ▀▄▄▄    █       █ █ █ █▄▄▄█   █   █▄▄▄
+█       █   █ ▀▄      █   █       █   █ █   █   █   █
+▀     ▀▀▀▀▀ ▀   ▀ ▀▀▀▀    ▀       ▀   ▀ ▀   ▀   ▀   ▀▀▀▀▀</pre>
+<p class="line">a high-agency organizational harness.<br><span class="dim">your crew of agents does the work. you only make the calls.</span></p>
+<div class="bar"><span class="demo">DEMO</span> · crew stats · <span class="dim">made-up figures, replayed as if live</span></div>
+<div class="grid"><pre class="p" id="p-a"><b>AUTONOMY</b>
+<i>today</i>
+<span class="big" data-big>▀▀▀▀██    ██  ██
+  ▀▀██    ▀▀▀▀██
+▀▀▀▀▀▀ ▀▀     ▀▀</span>
+h per needed decision
+<span data-l1>9 needed · 31 steering</span>
+7d <span class="sp" data-sp>▂▃▅▃▆▇▆</span> h/need
+<i>as of <span data-clock>09:41</span></i></pre><pre class="p" id="p-t"><b>TRUST</b>
+<i>since each grant</i>
+<span class="big" data-big>██▀▀▀▀
+██▀▀██
+▀▀▀▀▀▀</span>
+grants held
+<span data-l1>214 landed, no card</span>
+7d <span class="sp" data-sp>▁▂▂▃▄▆█</span> no card
+<i>as of <span data-clock>09:41</span></i></pre><pre class="p" id="p-c"><b>CLOSED LOOP</b>
+<i>landed, last 7 d</i>
+<span class="big" data-big>▀▀▀▀██ ██▀▀██ ▀▀  ▄▄▀▀
+    ██ ██▀▀██   ▄▄▀▀  
+    ▀▀ ▀▀▀▀▀▀ ▀▀    ▀▀</span>
+closed within 24 h
+<span data-l1>25 of 32 · 4 too new</span>
+7d <span class="sp" data-sp>▃▄▅▅▆▇▆</span> % closed
+<i>as of <span data-clock>09:41</span></i></pre></div>
+<pre class="foot" data-foot>longest stretch with no needed decision ≤14.2 h (7 d) · 0 undone · 1 re-press
+WAITING 6 h oldest · 4 items, 1 ≥12 h
+Captain 2·1.5 h  Quartermaster 1·0.2 h  leads 3·6 h  2 READY</pre>
+<div class="log" aria-live="off" data-log></div>
+<footer>firstmate.sh · coming soon · nothing to sign up for yet<span class="cur"></span></footer>
+<script>
+(()=>{
+const q=new URLSearchParams(location.search).get("theme");if(q==="light"||q==="dark")document.documentElement.dataset.theme=q;
+const D={"0": ["██▀▀██", "██  ██", "▀▀▀▀▀▀"], "1": ["▀▀██  ", "  ██  ", "▀▀▀▀▀▀"], "2": ["▀▀▀▀██", "██▀▀▀▀", "▀▀▀▀▀▀"], "3": ["▀▀▀▀██", "  ▀▀██", "▀▀▀▀▀▀"], "4": ["██  ██", "▀▀▀▀██", "    ▀▀"], "5": ["██▀▀▀▀", "▀▀▀▀██", "▀▀▀▀▀▀"], "6": ["██▀▀▀▀", "██▀▀██", "▀▀▀▀▀▀"], "7": ["▀▀▀▀██", "    ██", "    ▀▀"], "8": ["██▀▀██", "██▀▀██", "▀▀▀▀▀▀"], "9": ["██▀▀██", "▀▀▀▀██", "▀▀▀▀▀▀"], ".": ["  ", "  ", "▀▀"], "%": ["▀▀  ▄▄▀▀", "  ▄▄▀▀  ", "▀▀    ▀▀"]};
+const big=s=>[0,1,2].map(r=>[...s].map(c=>D[c][r]).join(" ")).join("\n");
+const S={a:3.4,t:6,c:78},bars="▁▂▃▄▅▆▇█";
+const pad=n=>String(n).padStart(2,"0");
+const lines=["lead · review passed on the exact version · card sent","lead · tests green · waiting on nobody","Quartermaster · merged to staging under a held grant","lead · picture checked at phone width","lead · asked one question · answered from the card","lead · closed the loop: landed, verified, reported"];
+const log=document.querySelector("[data-log]");let li=0,t=new Date();t.setHours(9,41,0,0);
+function tick(){
+ t=new Date(t.getTime()+60000);const hm=pad(t.getHours())+":"+pad(t.getMinutes());
+ document.querySelectorAll("[data-clock]").forEach(e=>e.textContent=hm);
+ S.a=Math.max(2.1,Math.min(5.9,+(S.a+(Math.random()-.45)*.3).toFixed(1)));
+ if(Math.random()<.15)S.t=Math.min(9,S.t+1);
+ S.c=Math.max(61,Math.min(94,S.c+Math.round((Math.random()-.4)*3)));
+ const v={a:S.a.toFixed(1),t:String(S.t),c:S.c+"%"};
+ for(const k in v){const p=document.getElementById("p-"+k);p.querySelector("[data-big]").textContent=big(v[k]);
+  const sp=p.querySelector("[data-sp]");sp.textContent=sp.textContent.slice(1)+bars[Math.floor(Math.random()*4)+3];}
+ const e=document.createElement("span");e.textContent=hm+"  "+lines[li++%lines.length];log.prepend(e);while(log.children.length>5)log.lastChild.remove();
+}
+tick();if(!matchMedia("(prefers-reduced-motion: reduce)").matches)setInterval(tick,2400);
+})();
+</script>
+</body></html>
