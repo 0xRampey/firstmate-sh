@@ -4,10 +4,9 @@
 <meta name="description" content="First Mate: a high-agency organizational harness. Your crew of agents works; you make the calls.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:,">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@900&display=swap" rel="stylesheet">
 <style>
+/* Departure Mono 1.500 by Helena Zhang, SIL OFL 1.1: fonts/DepartureMono-LICENSE.txt */
+@font-face{font-family:"Departure Mono";font-weight:400;font-style:normal;font-display:swap;src:url(fonts/DepartureMono-Regular.woff2) format("woff2")}
 :root{--bg:#fbfbf8;--fg:#1d1f24;--dim:#6b6f78;--acc:#b5560f;--ok:#2f7d32;--rule:#d9d9d2}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#16171f;--fg:#e6e6e3;--dim:#8a8e99;--acc:#f5a356;--ok:#7cc77f;--rule:#2c2e38}}
 :root[data-theme=dark]{--bg:#16171f;--fg:#e6e6e3;--dim:#8a8e99;--acc:#f5a356;--ok:#7cc77f;--rule:#2c2e38}
@@ -23,7 +22,7 @@ body{font:14px/1.35 ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",mon
 .cap>div{max-width:1048px;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between;align-items:flex-end}
 .hint{color:var(--dim);font-size:12px}
 pre{margin:0;font:inherit;white-space:pre}
-.line{margin:0;font-size:clamp(14px,2.2vw,18px)}
+.line{margin:0;font-family:"Departure Mono",ui-monospace,"SF Mono",Menlo,monospace;font-size:clamp(14px,2.2vw,18px)}
 .dim,i{color:var(--dim);font-style:normal}
 .bar{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:22px 0 14px;padding:6px 0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .demo{color:var(--acc)}
@@ -107,11 +106,14 @@ tick();if(!calm)setInterval(tick,2400);
 // Pointer is a hull (bow push + wake rings); a click sends a ring. Pauses when hidden or off screen;
 // a single settled frame under reduced motion.
 (()=>{
-const FONT='Big Shoulders Display';
+const FONT='Departure Mono';
+// ship glyph (a brig) in a 100-unit box; it bobs and tilts on the swell beside the wordmark
+const R=(x,y,w,h)=>`M${x} ${y}h${w}v${h}h${-w}Z`,PL=(...p)=>"M"+p.map(q=>q.join(" ")).join("L")+"Z",SQ=(cx,y0,y1,wt,wb)=>PL([cx-wt/2,y0],[cx+wt/2,y0],[cx+wb/2,y1],[cx-wb/2,y1]);
+const SHIP=[PL([3,53],[14,62],[86,62],[98,50],[94,70],[85,80],[17,80],[8,71]),R(31.7,8,2.6,54),R(65.7,8,2.6,54),...[33,67].flatMap(c=>[SQ(c,12,22,14,17),SQ(c,26,38,18,22),SQ(c,42,57,22,26)]),PL([68.3,6],[52.3,9],[68.3,12])].join(" ");
 const cv=document.getElementById("sea");if(!cv||!cv.getContext)return;
 const ctx=cv.getContext("2d",{alpha:false}),hero=cv.parentElement;
 const RM=matchMedia("(prefers-reduced-motion: reduce)");
-let W=0,H=0,DPR=1,N=0,BX,BY,TP,X,Y,SZ,TX,TY,HAS,M,M0,DL,OX,OY,PH,BK,ORD,fsz=2.4;
+let W=0,H=0,DPR=1,N=0,BX,BY,TP,X,Y,SZ,TX,TY,HAS,GL,M,M0,DL,OX,OY,PH,BK,ORD,fsz=2.4,gl={x:0,y:0};
 let colors={},styles=[];const NB_SEA=12,NB_ACC=8,NB=NB_SEA+NB_ACC;
 const sources=[],ptr={x:-1e4,y:-1e4,on:false,speed:0,t:0,ex:-1e4,ey:-1e4};
 const T={goal:0,t0:-100,dur:1.5,maxDelay:1.05,typed:false,phase:"sea",ps:0};
@@ -132,7 +134,7 @@ function build(){
  const cols=Math.ceil(W/g)+2,rows=Math.max(8,Math.round(seaH/g*1.5));N=cols*rows;
  const F=()=>new Float32Array(N);
  BX=F();BY=F();TP=F();X=F();Y=F();SZ=F();TX=F();TY=F();M=F();M0=F();DL=F();OX=F();OY=F();PH=F();
- HAS=new Uint8Array(N);BK=new Uint8Array(N);ORD=new Int32Array(N);
+ HAS=new Uint8Array(N);GL=new Uint8Array(N);BK=new Uint8Array(N);ORD=new Int32Array(N);
  let i=0;
  for(let k=0;k<rows;k++){const f=k/(rows-1),t=0.08+0.92*f,y=hz+(seaH+g)*Math.pow(f,1.45);
   for(let c=0;c<cols;c++,i++){BX[i]=(c-1+(k&1)*0.5)*g+(Math.random()-0.5)*g*0.3;BY[i]=y;TP[i]=t;PH[i]=Math.random()*6.283;OX[i]=(Math.random()-0.5)*120;OY[i]=-40-Math.random()*110;}}
@@ -141,16 +143,19 @@ function build(){
 function layout(){
  const oc=document.createElement("canvas");oc.width=W;oc.height=H;
  const o=oc.getContext("2d",{willReadFrequently:true});o.fillStyle="#fff";o.textBaseline="alphabetic";
- const face=px=>`900 ${px}px "${FONT}", ui-monospace, Menlo, monospace`;
- const sp=fs=>{if("letterSpacing" in o)o.letterSpacing=(fs*0.05).toFixed(1)+"px"};
+ const face=px=>`400 ${px}px "${FONT}", ui-monospace, Menlo, monospace`;
+ const sp=fs=>{if("letterSpacing" in o)o.letterSpacing=(fs*0.02).toFixed(1)+"px"};
  o.font=face(100);sp(100);
  const narrow=W<700,lines=narrow?["FIRST","MATE"]:["FIRST MATE"];
  const w100=Math.max(...lines.map(l=>o.measureText(l).width));
  const m=o.measureText("FIRST"),asc=(m.actualBoundingBoxAscent||72)/100;
- const fs=Math.min((narrow?W*0.86:Math.min(W*0.84,1200))/(w100/100),H*(narrow?0.17:0.24));
+ const fs=Math.min((narrow?W*0.86:Math.min(W*0.8,1200))/(w100/100+(narrow?0:1.7*asc)),H*(narrow?0.17:0.24));
  o.font=face(fs);sp(fs);
- const lh=fs*asc*1.28,blockH=fs*asc+(lines.length-1)*lh,cy=H*(narrow?0.38:0.42);
- lines.forEach((l,k)=>{const w=o.measureText(l).width;o.fillText(l,(W-w)/2,cy-blockH/2+fs*asc+k*lh);});
+ const cap=fs*asc,lh=cap*1.28,blockH=cap+(lines.length-1)*lh,cy=H*(narrow?0.44:0.42),ww=Math.max(...lines.map(l=>o.measureText(l).width));
+ const gs=narrow?cap*1.5:cap*1.4,gx=narrow?(W-gs)/2:(W-(gs+cap*0.3+ww))/2,gy=narrow?cy-blockH/2-gs*1.02:cy-gs*0.62;
+ lines.forEach((l,k)=>{const w=o.measureText(l).width;o.fillText(l,narrow?(W-w)/2:gx+gs+cap*0.3,cy-blockH/2+cap+k*lh);});
+ o.save();o.translate(gx,gy);o.scale(gs/100,gs/100);o.fill(new Path2D(SHIP));o.restore();
+ gl={x:gx+gs/2,y:gy+gs*0.66,x0:gx-2,x1:gx+gs+2,y0:gy-2,y1:gy+gs+2};
  const img=o.getImageData(0,0,W,H).data;
  let ink=0;for(let y=0;y<H;y+=2)for(let x=0;x<W;x+=2)if(img[(y*W+x)*4+3]>128)ink++;ink*=4;
  const want=Math.floor(N*0.42),s=Math.max(narrow?2.6:3.2,Math.sqrt(ink/want)),pts=[];
@@ -158,9 +163,9 @@ function layout(){
  const shuf=a=>{for(let k=a.length-1;k>0;k--){const j=(Math.random()*(k+1))|0;[a[k],a[j]]=[a[j],a[k]];}return a};
  shuf(pts);const K=Math.min(pts.length,want),tg=pts.slice(0,K).sort((a,b)=>a[0]-b[0]);
  const pick=shuf(Array.from({length:N},(_,i)=>i)).slice(0,K).sort((a,b)=>BX[a]-BX[b]);
- HAS.fill(0);const minx=K?tg[0][0]:0,maxx=K?tg[K-1][0]:1;
+HAS.fill(0);GL.fill(0);const minx=K?tg[0][0]:0,maxx=K?tg[K-1][0]:1;
  fsz=Math.max(1.8,Math.min(3.8,s*0.8));
- for(let k=0;k<K;k++){const i=pick[k];HAS[i]=1;TX[i]=tg[k][0];TY[i]=tg[k][1];DL[i]=(tg[k][0]-minx)/Math.max(1,maxx-minx)*0.9+Math.random()*0.15;}
+ for(let k=0;k<K;k++){const i=pick[k];HAS[i]=1;TX[i]=tg[k][0];TY[i]=tg[k][1];DL[i]=(tg[k][0]-minx)/Math.max(1,maxx-minx)*0.9+Math.random()*0.15;if(tg[k][0]>=gl.x0&&tg[k][0]<=gl.x1&&tg[k][1]>=gl.y0&&tg[k][1]<=gl.y1)GL[i]=1;}
 }
 const ease=x=>x<0.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
 function go(goal,now){for(let i=0;i<N;i++)M0[i]=M[i];T.goal=goal;T.t0=now;T.dur=goal?1.5:1.7;T.typed=goal===1;}
@@ -174,6 +179,7 @@ function step(now){
  for(let k=sources.length-1;k>=0;k--)if(now-sources[k].t0>sources[k].life)sources.splice(k,1);
  const S=sources.map(s=>{const a=now-s.t0,r=a*s.spd;return{x:s.x,y:s.y,r,w:s.w,d:Math.pow(1-a/s.life,2)*s.amp,ro:r+3*s.w,ri:Math.max(0,r-3*s.w),acc:s.acc}});
  ptr.speed*=0.9;const hullR=46+Math.min(40,ptr.speed*0.02),hullA=Math.min(1,ptr.speed/400)*22;
+ const gbob=Math.sin(now*1.25)*3,grot=Math.sin(now*0.9)*0.07,gcr=Math.cos(grot),gsr=Math.sin(grot);
  const cnt=new Int32Array(NB);
  for(let i=0;i<N;i++){
   let m=0;
@@ -183,7 +189,8 @@ function step(now){
   const h=Math.sin(wx*5.2+z*1.6-now*0.85)*0.55+Math.sin(wx*-2.7+z*2.8-now*1.25+1.3)*0.32+Math.sin(wx*12+z*0.9+now*0.6)*0.13;
   const sx=BX[i]+Math.sin(z*2.1-now*0.7+wx*3)*3*t,sy=BY[i]-h*amp*t;
   let x=sx,y=sy;
-  if(m>0){const br=m>=1?0.5:0,ph=PH[i],fx=TX[i]+Math.sin(now*1.3+ph)*br,fy=TY[i]+Math.cos(now*1.1+ph)*br,arc=Math.sin(Math.PI*m);
+  if(m>0){const br=m>=1?0.5:0,ph=PH[i];let tx=TX[i],ty=TY[i];if(GL[i]){const ddx=tx-gl.x,ddy=ty-gl.y;tx=gl.x+ddx*gcr-ddy*gsr;ty=gl.y+ddx*gsr+ddy*gcr+gbob;}
+   const fx=tx+Math.sin(now*1.3+ph)*br,fy=ty+Math.cos(now*1.1+ph)*br,arc=Math.sin(Math.PI*m);
    x=sx+(fx-sx)*m+OX[i]*arc;y=sy+(fy-sy)*m+OY[i]*arc;}
   let dx=0,dy=0,foam=0,accf=0;
   for(let k=0;k<S.length;k++){const s=S[k],ax=x-s.x;if(ax>s.ro||ax<-s.ro)continue;const ay=(y-s.y)/0.6;if(ay>s.ro||ay<-s.ro)continue;
@@ -227,7 +234,7 @@ const relayout=()=>{readColors();if(ready&&(RM.matches||!running))step(clock);};
 matchMedia("(prefers-color-scheme: dark)").addEventListener&&matchMedia("(prefers-color-scheme: dark)").addEventListener("change",relayout);
 let rt=0;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!ready)return;const formed=T.goal===1;build();if(formed){for(let i=0;i<N;i++)M[i]=HAS[i];go(1,clock-10);}if(RM.matches)still();},150);});
 readColors();
-const fl=document.fonts&&document.fonts.load?Promise.race([document.fonts.load(`900 100px "${FONT}"`),new Promise(r=>setTimeout(r,1500))]):Promise.resolve();
+const fl=document.fonts&&document.fonts.load?Promise.race([document.fonts.load(`400 100px "${FONT}"`,"FIRST MATE"),new Promise(r=>setTimeout(r,1500))]):Promise.resolve();
 fl.catch(()=>{}).then(()=>{build();ready=true;
  const q=new URLSearchParams(location.search).get("hero");
  if(q==="form"){for(let i=0;i<N;i++)M[i]=HAS[i];go(1,-10);T.phase="hold";T.ps=1e9;}
